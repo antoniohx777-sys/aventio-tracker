@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aventio — Client Acquisition Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg-2: #111111;
+    --bg-3: #1a1a1a;
+    --bg-4: #222222;
+    --orange: #f97316;
+    --orange-dim: #c2500a;
+    --orange-glow: rgba(249,115,22,0.12);
+    --orange-border: rgba(249,115,22,0.3);
+    --text: #f5f5f5;
+    --text-2: #a3a3a3;
+    --text-3: #666;
+    --border: rgba(255,255,255,0.07);
+    --border-2: rgba(255,255,255,0.12);
+    --green: #22c55e;
+    --green-bg: rgba(34,197,94,0.1);
+    --red: #ef4444;
+    --red-bg: rgba(239,68,68,0.1);
+    --yellow: #eab308;
+    --yellow-bg: rgba(234,179,8,0.1);
+    --blue: #3b82f6;
+    --blue-bg: rgba(59,130,246,0.1);
+    --font-display: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* HEADER */
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    background: rgba(10,10,10,0.95);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--orange);
+    border-radius: 50%;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .month-badge {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--orange);
+    background: var(--orange-glow);
+    border: 1px solid var(--orange-border);
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.08em;
+  }
+
+  .btn-add {
+    background: var(--orange);
+    color: #000;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    transition: background 0.15s;
+  }
+
+  .btn-add:hover { background: #fb923c; }
+
+  /* MAIN LAYOUT */
+  .main { padding: 28px 32px; }
+
+  /* WEEK TABS */
+  .week-nav {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 28px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 4px;
+    width: fit-content;
+  }
+
+  .week-tab {
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--text-2);
+    transition: all 0.15s;
+    letter-spacing: 0.01em;
+  }
+
+  .week-tab:hover { color: var(--text); }
+
+  .week-tab.active {
+    background: var(--orange);
+    color: #000;
+  }
+
+  /* STATS ROW */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    transition: border-color 0.15s;
+  }
+
+  .stat-card:hover { border-color: var(--border-2); }
+
+  .stat-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .stat-value.orange { color: var(--orange); }
+  .stat-value.green { color: var(--green); }
+
+  .stat-sub {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: 4px;
+  }
+
+  /* PROGRESS BAR */
+  .progress-wrap {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .progress-label {
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-2);
+    white-space: nowrap;
+    letter-spacing: 0.03em;
+  }
+
+  .progress-track {
+    flex: 1;
+    height: 6px;
+    background: var(--bg-4);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--orange);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+
+  .progress-pct {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--orange);
+    white-space: nowrap;
+  }
+
+  /* FILTERS */
+  .filters-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-2);
+    transition: all 0.15s;
+    font-family: var(--font-body);
+  }
+
+  .filter-btn:hover { border-color: var(--border-2); color: var(--text); }
+  .filter-btn.active { border-color: var(--orange); color: var(--orange); background: var(--orange-glow); }
+
+  .search-input {
+    margin-left: auto;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 7px 14px;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 13px;
+    outline: none;
+    width: 220px;
+    transition: border-color 0.15s;
+  }
+
+  .search-input::placeholder { color: var(--text-3); }
+  .search-input:focus { border-color: var(--orange-border); }
+
+  /* TABLE */
+  .table-wrap {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead th {
+    padding: 12px 14px;
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-3);
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+    cursor: pointer;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--bg-3); }
+
+  tbody td {
+    padding: 13px 14px;
+    font-size: 13px;
+    vertical-align: middle;
+  }
+
+  .prospect-name {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .prospect-handle {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: 2px;
+  }
+
+  /* STATUS BADGES */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+    font-family: var(--font-body);
+  }
+
+  .badge-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+  }
+
+  .badge-identified { background: rgba(100,100,100,0.15); color: #888; }
+  .badge-identified .badge-dot { background: #888; }
+
+  .badge-dossier { background: var(--blue-bg); color: var(--blue); }
+  .badge-dossier .badge-dot { background: var(--blue); }
+
+  .badge-loom { background: var(--orange-glow); color: var(--orange); }
+  .badge-loom .badge-dot { background: var(--orange); }
+
+  .badge-replied { background: var(--yellow-bg); color: var(--yellow); }
+  .badge-replied .badge-dot { background: var(--yellow); }
+
+  .badge-booked { background: rgba(168,85,247,0.1); color: #a855f7; }
+  .badge-booked .badge-dot { background: #a855f7; }
+
+  .badge-called { background: rgba(20,184,166,0.1); color: #14b8a6; }
+  .badge-called .badge-dot { background: #14b8a6; }
+
+  .badge-followup { background: var(--yellow-bg); color: #f59e0b; }
+  .badge-followup .badge-dot { background: #f59e0b; }
+
+  .badge-closed { background: var(--green-bg); color: var(--green); }
+  .badge-closed .badge-dot { background: var(--green); }
+
+  .badge-cold { background: var(--red-bg); color: var(--red); }
+  .badge-cold .badge-dot { background: var(--red); }
+
+  /* TIER BADGES */
+  .tier-1 {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--orange);
+    background: var(--orange-glow);
+    border: 1px solid var(--orange-border);
+    padding: 2px 7px;
+    border-radius: 3px;
+  }
+
+  .tier-2 {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-3);
+    background: var(--bg-4);
+    border: 1px solid var(--border);
+    padding: 2px 7px;
+    border-radius: 3px;
+  }
+
+  .followers-cell {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-2);
+  }
+
+  .offer-cell {
+    font-size: 12px;
+    color: var(--text-2);
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .gap-cell {
+    font-size: 12px;
+    color: var(--text-2);
+    max-width: 160px;
+  }
+
+  .date-cell {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-3);
+  }
+
+  /* ACTION BUTTONS */
+  .action-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: var(--font-body);
+    white-space: nowrap;
+  }
+
+  .action-btn:hover { border-color: var(--orange-border); color: var(--orange); }
+
+  .action-btn-orange {
+    background: var(--orange-glow);
+    border: 1px solid var(--orange-border);
+    color: var(--orange);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: var(--font-body);
+  }
+
+  .action-btn-orange:hover { background: var(--orange); color: #000; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--bg-2);
+    border: 1px solid var(--border-2);
+    border-radius: 12px;
+    width: 580px;
+    max-width: 95vw;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+
+  .modal-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .modal-title {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--text-3);
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px;
+    transition: color 0.15s;
+  }
+
+  .modal-close:hover { color: var(--text); }
+
+  .modal-body { padding: 20px 24px; }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .form-group.full { grid-column: 1 / -1; }
+
+  .form-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  .form-input, .form-select, .form-textarea {
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 9px 12px;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--orange-border);
+  }
+
+  .form-select { cursor: pointer; appearance: none; }
+  .form-textarea { resize: vertical; min-height: 72px; }
+
+  .modal-footer {
+    padding: 16px 24px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  .btn-cancel {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    padding: 9px 18px;
+    border-radius: 6px;
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-cancel:hover { border-color: var(--border-2); color: var(--text); }
+
+  .btn-save {
+    background: var(--orange);
+    border: none;
+    color: #000;
+    padding: 9px 20px;
+    border-radius: 6px;
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn-save:hover { background: #fb923c; }
+
+  /* DETAIL DRAWER */
+  .drawer-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 150;
+  }
+
+  .drawer-overlay.open { display: block; }
+
+  .drawer {
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 400px;
+    background: var(--bg-2);
+    border-left: 1px solid var(--border-2);
+    z-index: 151;
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .drawer.open { transform: translateX(0); }
+
+  .drawer-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .drawer-name {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text);
+  }
+
+  .drawer-handle {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--orange);
+    margin-top: 2px;
+  }
+
+  .drawer-body { padding: 20px 24px; flex: 1; }
+
+  .drawer-section {
+    margin-bottom: 20px;
+  }
+
+  .drawer-section-title {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .drawer-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .drawer-field-label {
+    font-size: 12px;
+    color: var(--text-3);
+    white-space: nowrap;
+    min-width: 110px;
+  }
+
+  .drawer-field-value {
+    font-size: 13px;
+    color: var(--text);
+    text-align: right;
+    flex: 1;
+  }
+
+  .gap-box {
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.5;
+  }
+
+  .notes-box {
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.5;
+    min-height: 60px;
+  }
+
+  .stage-pipeline {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .stage-dot {
+    width: 28px;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--bg-4);
+    position: relative;
+  }
+
+  .stage-dot.done { background: var(--orange); }
+  .stage-dot.current { background: var(--orange); opacity: 0.5; }
+
+  .drawer-actions {
+    padding: 16px 24px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .status-select-wrap {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .status-select-wrap label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    white-space: nowrap;
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--text-3);
+  }
+
+  .empty-state-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    opacity: 0.4;
+  }
+
+  .empty-state-text {
+    font-family: var(--font-display);
+    font-size: 15px;
+    color: var(--text-2);
+    margin-bottom: 4px;
+  }
+
+  /* WEEK INFO BAR */
+  .week-info {
+    background: var(--orange-glow);
+    border: 1px solid var(--orange-border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .week-info-label {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--orange);
+    white-space: nowrap;
+  }
+
+  .week-info-desc {
+    font-size: 13px;
+    color: var(--text-2);
+  }
+
+  .week-info-goal {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--orange);
+    white-space: nowrap;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--bg-4); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--border-2); }
+
+  @media (max-width: 900px) {
+    .main { padding: 16px; }
+    .header { padding: 0 16px; }
+    .stats-row { grid-template-columns: repeat(3, 1fr); }
+    .drawer { width: 100%; }
+    table { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-dot"></div>
+    AVENTIO
+  </div>
+  <div class="header-right">
+    <span class="month-badge" id="current-month-badge">JUNE 2026</span>
+    <button class="btn-add" onclick="openAddModal()">+ Add Prospect</button>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- WEEK TABS -->
+  <div class="week-nav">
+    <button class="week-tab active" onclick="setWeek(1, this)">Week 1 — Research</button>
+    <button class="week-tab" onclick="setWeek(2, this)">Week 2 — Loom Outreach</button>
+    <button class="week-tab" onclick="setWeek(3, this)">Week 3 — Calls</button>
+    <button class="week-tab" onclick="setWeek(4, this)">Week 4 — Close</button>
+  </div>
+
+  <!-- WEEK INFO BAR -->
+  <div class="week-info" id="week-info-bar">
+    <span class="week-info-label">WEEK 1</span>
+    <span class="week-info-desc">Market research — funnel hack prospects and build full dossiers. Hard qualify before adding.</span>
+    <span class="week-info-goal" id="week-goal-text">GOAL: 50–80 prospects identified</span>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Total Prospects</div>
+      <div class="stat-value orange" id="stat-total">0</div>
+      <div class="stat-sub">this month</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Looms Sent</div>
+      <div class="stat-value" id="stat-looms">0</div>
+      <div class="stat-sub">week 2 target</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Calls Booked</div>
+      <div class="stat-value" id="stat-calls">0</div>
+      <div class="stat-sub">need 7–8 min</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Closed</div>
+      <div class="stat-value green" id="stat-closed">0</div>
+      <div class="stat-sub">target: 2/month</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Reply Rate</div>
+      <div class="stat-value" id="stat-reply-rate">—</div>
+      <div class="stat-sub">target: 15–20%</div>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap">
+    <span class="progress-label">MONTHLY CLOSE PROGRESS</span>
+    <div class="progress-track">
+      <div class="progress-fill" id="close-progress" style="width: 0%"></div>
+    </div>
+    <span class="progress-pct" id="close-pct">0 / 2</span>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters-row">
+    <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+    <button class="filter-btn" onclick="setFilter('identified', this)">Identified</button>
+    <button class="filter-btn" onclick="setFilter('dossier', this)">Dossier Done</button>
+    <button class="filter-btn" onclick="setFilter('loom', this)">Loom Sent</button>
+    <button class="filter-btn" onclick="setFilter('replied', this)">Replied</button>
+    <button class="filter-btn" onclick="setFilter('booked', this)">Call Booked</button>
+    <button class="filter-btn" onclick="setFilter('called', this)">Called</button>
+    <button class="filter-btn" onclick="setFilter('followup', this)">Follow Up</button>
+    <button class="filter-btn" onclick="setFilter('closed', this)">Closed</button>
+    <button class="filter-btn" onclick="setFilter('cold', this)">Cold</button>
+    <input class="search-input" type="text" placeholder="Search name, handle, niche..." id="search-input" oninput="renderTable()">
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Prospect</th>
+          <th>Niche</th>
+          <th>Followers</th>
+          <th>Offer / Price</th>
+          <th>Tier</th>
+          <th>Status</th>
+          <th>Gap / Bottleneck</th>
+          <th>Date Added</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="prospect-tbody"></tbody>
+    </table>
+    <div class="empty-state" id="empty-state" style="display:none">
+      <div class="empty-state-icon">◎</div>
+      <div class="empty-state-text">No prospects here yet</div>
+      <div style="font-size:13px; margin-top:4px;">Add your first prospect to start the system</div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ADD / EDIT MODAL -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Add Prospect</span>
+      <button class="modal-close" onclick="closeAddModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input class="form-input" id="f-name" type="text" placeholder="e.g. John Smith">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Instagram Handle</label>
+          <input class="form-input" id="f-handle" type="text" placeholder="@handle">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Niche</label>
+          <input class="form-input" id="f-niche" type="text" placeholder="e.g. Forex Trading">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Followers</label>
+          <input class="form-input" id="f-followers" type="text" placeholder="e.g. 42K">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Offer Description</label>
+          <input class="form-input" id="f-offer" type="text" placeholder="e.g. Trading Mentorship">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Offer Price</label>
+          <input class="form-input" id="f-price" type="text" placeholder="e.g. $2,000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tier</label>
+          <select class="form-select" id="f-tier">
+            <option value="1">Tier 1 — Perfect fit</option>
+            <option value="2">Tier 2 — Good fit</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-select" id="f-status">
+            <option value="identified">Identified</option>
+            <option value="dossier">Dossier Complete</option>
+            <option value="loom">Loom Sent</option>
+            <option value="replied">Replied</option>
+            <option value="booked">Call Booked</option>
+            <option value="called">Called</option>
+            <option value="followup">Follow Up</option>
+            <option value="closed">Closed</option>
+            <option value="cold">Cold</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Funnel Gap / Bottleneck</label>
+          <textarea class="form-textarea" id="f-gap" placeholder="e.g. No VSL, DM-only intake with 40K followers. Converting manually — zero cold traffic infrastructure."></textarea>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Personalization Hook (for Loom opening)</label>
+          <textarea class="form-textarea" id="f-hook" placeholder="e.g. Dropped a new program last week with no landing page — just 'DM me' in bio. Easy observation to open with."></textarea>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Notes</label>
+          <textarea class="form-textarea" id="f-notes" placeholder="Any extra context, follow-up dates, objections..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeAddModal()">Cancel</button>
+      <button class="btn-save" onclick="saveProspect()">Save Prospect</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL DRAWER -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="detail-drawer">
+  <div class="drawer-header">
+    <div>
+      <div class="drawer-name" id="d-name">—</div>
+      <div class="drawer-handle" id="d-handle">—</div>
+    </div>
+    <button class="modal-close" onclick="closeDrawer()" style="font-size:24px; margin-top:4px;">×</button>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-section">
+      <div class="drawer-section-title">Pipeline Stage</div>
+      <div class="stage-pipeline" id="d-pipeline"></div>
+      <div style="margin-top:8px;" id="d-badge-wrap"></div>
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-section-title">Prospect Info</div>
+      <div class="drawer-field"><span class="drawer-field-label">Niche</span><span class="drawer-field-value" id="d-niche">—</span></div>
+      <div class="drawer-field"><span class="drawer-field-label">Followers</span><span class="drawer-field-value" id="d-followers">—</span></div>
+      <div class="drawer-field"><span class="drawer-field-label">Offer</span><span class="drawer-field-value" id="d-offer">—</span></div>
+      <div class="drawer-field"><span class="drawer-field-label">Price Point</span><span class="drawer-field-value" id="d-price">—</span></div>
+      <div class="drawer-field"><span class="drawer-field-label">Tier</span><span class="drawer-field-value" id="d-tier">—</span></div>
+      <div class="drawer-field"><span class="drawer-field-label">Date Added</span><span class="drawer-field-value" id="d-date">—</span></div>
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-section-title">Funnel Gap / Bottleneck</div>
+      <div class="gap-box" id="d-gap">—</div>
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-section-title">Loom Personalization Hook</div>
+      <div class="gap-box" id="d-hook">—</div>
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-section-title">Notes</div>
+      <div class="notes-box" id="d-notes">—</div>
+    </div>
+  </div>
+  <div class="drawer-actions">
+    <div class="status-select-wrap">
+      <label>Update Status</label>
+      <select class="form-select" id="d-status-select" style="flex:1;" onchange="updateStatusFromDrawer()">
+        <option value="identified">Identified</option>
+        <option value="dossier">Dossier Complete</option>
+        <option value="loom">Loom Sent</option>
+        <option value="replied">Replied</option>
+        <option value="booked">Call Booked</option>
+        <option value="called">Called</option>
+        <option value="followup">Follow Up</option>
+        <option value="closed">Closed</option>
+        <option value="cold">Cold</option>
+      </select>
+    </div>
+    <div style="display:flex; gap:8px; margin-top:4px;">
+      <button class="action-btn" style="flex:1;" onclick="editFromDrawer()">Edit Details</button>
+      <button class="action-btn" style="flex:1; color: var(--red); border-color: rgba(239,68,68,0.3);" onclick="deleteFromDrawer()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STAGES = ['identified','dossier','loom','replied','booked','called','followup','closed','cold'];
+const STAGE_LABELS = {
+  identified: 'Identified',
+  dossier: 'Dossier Done',
+  loom: 'Loom Sent',
+  replied: 'Replied',
+  booked: 'Call Booked',
+  called: 'Called',
+  followup: 'Follow Up',
+  closed: 'Closed',
+  cold: 'Cold'
+};
+
+const WEEK_INFO = {
+  1: { label: 'WEEK 1', desc: 'Market research — funnel hack prospects and build full dossiers. Hard qualify before adding.', goal: 'GOAL: 50–80 prospects identified' },
+  2: { label: 'WEEK 2', desc: 'Loom outreach — record personalized Looms and send every DM. 10–12 per day.', goal: 'GOAL: All Looms sent' },
+  3: { label: 'WEEK 3', desc: 'Follow ups, booking calls, and hopping on with early responders.', goal: 'GOAL: 5–10 calls booked' },
+  4: { label: 'WEEK 4', desc: 'Continue conversations, follow up non-replies, push pipeline to close.', goal: 'GOAL: 2 clients signed' }
+};
+
+let prospects = JSON.parse(localStorage.getItem('aventio-prospects') || '[]');
+let currentFilter = 'all';
+let currentWeek = 1;
+let editingId = null;
+let drawerProspectId = null;
+
+function save() {
+  localStorage.setItem('aventio-prospects', JSON.stringify(prospects));
+}
+
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+function setWeek(w, btn) {
+  currentWeek = w;
+  document.querySelectorAll('.week-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const info = WEEK_INFO[w];
+  document.getElementById('week-info-bar').querySelector('.week-info-label').textContent = info.label;
+  document.getElementById('week-info-bar').querySelector('.week-info-desc').textContent = info.desc;
+  document.getElementById('week-goal-text').textContent = info.goal;
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTable();
+}
+
+function badgeHTML(status) {
+  const cls = `badge badge-${status}`;
+  return `<span class="${cls}"><span class="badge-dot"></span>${STAGE_LABELS[status] || status}</span>`;
+}
+
+function renderTable() {
+  const search = document.getElementById('search-input').value.toLowerCase();
+  let filtered = prospects.filter(p => {
+    if (currentFilter !== 'all' && p.status !== currentFilter) return false;
+    if (search) {
+      const hay = `${p.name} ${p.handle} ${p.niche} ${p.offer}`.toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  });
+
+  const tbody = document.getElementById('prospect-tbody');
+  const empty = document.getElementById('empty-state');
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    updateStats();
+    return;
+  }
+
+  empty.style.display = 'none';
+  tbody.innerHTML = filtered.map(p => `
+    <tr onclick="openDrawer('${p.id}')">
+      <td>
+        <div class="prospect-name">${p.name || '—'}</div>
+        <div class="prospect-handle">${p.handle || ''}</div>
+      </td>
+      <td style="color:var(--text-2); font-size:13px;">${p.niche || '—'}</td>
+      <td class="followers-cell">${p.followers || '—'}</td>
+      <td>
+        <div class="offer-cell">${p.offer || '—'}</div>
+        <div style="font-family:var(--font-mono); font-size:11px; color:var(--orange); margin-top:2px;">${p.price || ''}</div>
+      </td>
+      <td><span class="tier-${p.tier || 2}">T${p.tier || 2}</span></td>
+      <td>${badgeHTML(p.status || 'identified')}</td>
+      <td class="gap-cell" style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${p.gap || '—'}</td>
+      <td class="date-cell">${p.date || '—'}</td>
+      <td onclick="event.stopPropagation()">
+        <button class="action-btn-orange" onclick="quickStatus('${p.id}')">Advance →</button>
+      </td>
+    </tr>
+  `).join('');
+
+  updateStats();
+}
+
+function updateStats() {
+  const total = prospects.length;
+  const looms = prospects.filter(p => ['loom','replied','booked','called','followup','closed'].includes(p.status)).length;
+  const calls = prospects.filter(p => ['booked','called','followup','closed'].includes(p.status)).length;
+  const closed = prospects.filter(p => p.status === 'closed').length;
+  const replied = prospects.filter(p => ['replied','booked','called','followup','closed'].includes(p.status)).length;
+  const replyRate = looms > 0 ? Math.round((replied / looms) * 100) : null;
+
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-looms').textContent = looms;
+  document.getElementById('stat-calls').textContent = calls;
+  document.getElementById('stat-closed').textContent = closed;
+  document.getElementById('stat-reply-rate').textContent = replyRate !== null ? replyRate + '%' : '—';
+
+  const pct = Math.min(100, Math.round((closed / 2) * 100));
+  document.getElementById('close-progress').style.width = pct + '%';
+  document.getElementById('close-pct').textContent = `${closed} / 2`;
+
+  const now = new Date();
+  document.getElementById('current-month-badge').textContent =
+    now.toLocaleString('en-US', { month: 'long', year: 'numeric' }).toUpperCase();
+}
+
+function quickStatus(id) {
+  const p = prospects.find(x => x.id === id);
+  if (!p) return;
+  const idx = STAGES.indexOf(p.status);
+  if (idx < STAGES.length - 1 && p.status !== 'closed' && p.status !== 'cold') {
+    p.status = STAGES[idx + 1];
+    save();
+    renderTable();
+    if (drawerProspectId === id) openDrawer(id);
+  }
+}
+
+function openAddModal(editId) {
+  editingId = editId || null;
+  document.getElementById('modal-title').textContent = editId ? 'Edit Prospect' : 'Add Prospect';
+  const fields = ['name','handle','niche','followers','offer','price','gap','hook','notes'];
+  if (editId) {
+    const p = prospects.find(x => x.id === editId);
+    if (p) {
+      fields.forEach(f => { document.getElementById('f-' + f).value = p[f] || ''; });
+      document.getElementById('f-tier').value = p.tier || '1';
+      document.getElementById('f-status').value = p.status || 'identified';
+    }
+  } else {
+    fields.forEach(f => { document.getElementById('f-' + f).value = ''; });
+    document.getElementById('f-tier').value = '1';
+    document.getElementById('f-status').value = 'identified';
+  }
+  document.getElementById('add-modal').classList.add('open');
+}
+
+function closeAddModal() {
+  document.getElementById('add-modal').classList.remove('open');
+  editingId = null;
+}
+
+function saveProspect() {
+  const p = {
+    id: editingId || genId(),
+    name: document.getElementById('f-name').value.trim(),
+    handle: document.getElementById('f-handle').value.trim(),
+    niche: document.getElementById('f-niche').value.trim(),
+    followers: document.getElementById('f-followers').value.trim(),
+    offer: document.getElementById('f-offer').value.trim(),
+    price: document.getElementById('f-price').value.trim(),
+    tier: document.getElementById('f-tier').value,
+    status: document.getElementById('f-status').value,
+    gap: document.getElementById('f-gap').value.trim(),
+    hook: document.getElementById('f-hook').value.trim(),
+    notes: document.getElementById('f-notes').value.trim(),
+    date: editingId ? (prospects.find(x => x.id === editingId) || {}).date : new Date().toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'})
+  };
+
+  if (!p.name) { alert('Name is required'); return; }
+
+  if (editingId) {
+    const idx = prospects.findIndex(x => x.id === editingId);
+    if (idx !== -1) prospects[idx] = p;
+  } else {
+    prospects.unshift(p);
+  }
+
+  save();
+  closeAddModal();
+  renderTable();
+}
+
+function openDrawer(id) {
+  const p = prospects.find(x => x.id === id);
+  if (!p) return;
+  drawerProspectId = id;
+
+  document.getElementById('d-name').textContent = p.name || '—';
+  document.getElementById('d-handle').textContent = p.handle || '';
+  document.getElementById('d-niche').textContent = p.niche || '—';
+  document.getElementById('d-followers').textContent = p.followers || '—';
+  document.getElementById('d-offer').textContent = p.offer || '—';
+  document.getElementById('d-price').textContent = p.price || '—';
+  document.getElementById('d-tier').textContent = `Tier ${p.tier || 2}`;
+  document.getElementById('d-date').textContent = p.date || '—';
+  document.getElementById('d-gap').textContent = p.gap || 'Not specified';
+  document.getElementById('d-hook').textContent = p.hook || 'Not specified';
+  document.getElementById('d-notes').textContent = p.notes || '—';
+  document.getElementById('d-status-select').value = p.status || 'identified';
+  document.getElementById('d-badge-wrap').innerHTML = badgeHTML(p.status || 'identified');
+
+  const stageIdx = STAGES.indexOf(p.status || 'identified');
+  const pipelineStages = STAGES.slice(0, -1);
+  document.getElementById('d-pipeline').innerHTML = pipelineStages.map((s, i) => {
+    let cls = 'stage-dot';
+    if (i < stageIdx) cls += ' done';
+    else if (i === stageIdx) cls += ' current';
+    return `<div class="${cls}" title="${STAGE_LABELS[s]}"></div>`;
+  }).join('');
+
+  document.getElementById('drawer-overlay').classList.add('open');
+  document.getElementById('detail-drawer').classList.add('open');
+}
+
+function closeDrawer() {
+  document.getElementById('drawer-overlay').classList.remove('open');
+  document.getElementById('detail-drawer').classList.remove('open');
+  drawerProspectId = null;
+}
+
+function updateStatusFromDrawer() {
+  if (!drawerProspectId) return;
+  const p = prospects.find(x => x.id === drawerProspectId);
+  if (!p) return;
+  p.status = document.getElementById('d-status-select').value;
+  save();
+  renderTable();
+  openDrawer(drawerProspectId);
+}
+
+function editFromDrawer() {
+  closeDrawer();
+  openAddModal(drawerProspectId);
+}
+
+function deleteFromDrawer() {
+  if (!drawerProspectId) return;
+  if (!confirm('Delete this prospect?')) return;
+  prospects = prospects.filter(x => x.id !== drawerProspectId);
+  save();
+  closeDrawer();
+  renderTable();
+}
+
+renderTable();
+</script>
+</body>
+</html>
